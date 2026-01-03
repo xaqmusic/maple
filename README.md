@@ -94,3 +94,5 @@ Open your browser to the URL shown (usually `http://localhost:5173`).
 1. **Connect MIDI**: Ensure you have a MIDI destination available (e.g., a virtual MIDI port or a hardware synth connected via USB). Maple will detect available ports on startup.
 2. **Start Playback**: Toggle the play button in the global controls.
 3. **Experiment**: Click on different "Lobes" (sections of the leaf) to adjust their generation parameters. Change the global scale and tempo to suit your mood.
+
+Maple leaf vector image from https://www.vecteezy.com/
