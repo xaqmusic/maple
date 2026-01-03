@@ -6,6 +6,7 @@ import logging
 from midi_engine import midi_engine
 from fractal_logic import fractal_logic
 from state_manager import state_manager
+import time
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("maple.main")
@@ -44,37 +45,54 @@ async def startup_event():
 
 async def generation_loop():
     logger.info("Starting generation loop")
-    fractal_logic.playing = True # Auto start for now
+    was_playing = False
     
     while True:
-        # Pass global tempo, lobes, and scale from state_manager to tick
-        events = fractal_logic.tick(
-            state_manager.state.tempo, 
-            state_manager.state.lobes,
-            state_manager.state.selected_notes
-        )
+        is_playing = state_manager.state.playing
         
-        for event in events:
-            if event['type'] == 'note':
-                # Send to MIDI
-                midi_engine.send_note_on(event['channel'], event['note'], event['velocity'])
-                
-                # Send to Frontend
-                logger.info(f"Broadcasting Note: {event['note']} for Lobe {event['lobe_id']} [Port: {midi_engine.active_port_name}]")
-                await manager.broadcast({
-                    "type": "pulse",
-                    "lobe_id": event['lobe_id'],
-                    "note": event['note']
-                })
-                
-                # Non-blocking note off scheduler
-                asyncio.create_task(schedule_note_off(event['channel'], event['note'], event['duration']))
+        # Detect transition from Stopped to Playing
+        if is_playing and not was_playing:
+            logger.info("Playback STARTED: Resetting Engine")
+            fractal_logic.reset_engine()
+        
+        was_playing = is_playing
+
+        if not is_playing:
+            fractal_logic.last_tick = time.time() 
+            await asyncio.sleep(0.1)
+            continue
+
+        try:
+            # Pass global tempo, lobes, and scale from state_manager to tick
+            events = fractal_logic.tick(
+                state_manager.state.tempo, 
+                state_manager.state.lobes,
+                state_manager.state.selected_notes
+            )
             
-            elif event['type'] == 'stem_pulse':
-                await manager.broadcast({
-                    "type": "stem_pulse",
-                    "timestamp": event['timestamp']
-                })
+            if events:
+                for event in events:
+                    if event['type'] == 'note':
+                        midi_engine.send_note_on(event['channel'], event['note'], event['velocity'])
+                        
+                        logger.info(f"Broadcasting Note: {event['note']} for Lobe {event['lobe_id']} [Port: {midi_engine.active_port_name}]")
+                        await manager.broadcast({
+                            "type": "pulse",
+                            "lobe_id": event['lobe_id'],
+                            "note": event['note']
+                        })
+                        
+                        asyncio.create_task(schedule_note_off(event['channel'], event['note'], event['duration']))
+                    
+                    elif event['type'] == 'stem_pulse':
+                        await manager.broadcast({
+                            "type": "stem_pulse",
+                            "timestamp": event['timestamp']
+                        })
+
+        except Exception as e:
+            logger.error(f"Error in generation loop: {e}", exc_info=True)
+            await asyncio.sleep(1.0) # Backoff briefly on error
 
         await asyncio.sleep(0.02) # Higher resolution for tempo
 
@@ -117,6 +135,10 @@ async def websocket_endpoint(websocket: WebSocket):
                     p_idx = updates['selected_midi_port']
                     logger.info(f"Triggering MIDI port switch to index {p_idx}")
                     midi_engine.open_port(p_idx)
+                
+                if 'playing' in updates and updates['playing'] is False:
+                    logger.info("Playback STOPPED: Triggering All Notes Off")
+                    midi_engine.all_notes_off()
                 
                 await manager.broadcast({
                     "type": "global_update",

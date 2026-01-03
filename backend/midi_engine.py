@@ -57,17 +57,33 @@ class MidiEngine:
 
     def send_note_on(self, channel, note, velocity):
         if not self.midi_out: return
-        # Log port name to be sure it's correct in the gen loop
-        msg = mido.Message('note_on', channel=channel, note=note, velocity=velocity)
-        self.midi_out.send_message(msg.bytes())
+        try:
+            msg = mido.Message('note_on', channel=channel, note=note, velocity=velocity)
+            self.midi_out.send_message(msg.bytes())
+        except Exception as e:
+            logger.error(f"MIDI Send Error: {e}")
 
     def send_note_off(self, channel, note):
         if not self.midi_out: return
-        msg = mido.Message('note_off', channel=channel, note=note)
-        self.midi_out.send_message(msg.bytes())
+        try:
+            msg = mido.Message('note_off', channel=channel, note=note)
+            self.midi_out.send_message(msg.bytes())
+        except Exception as e:
+            logger.error(f"MIDI Send Off Error: {e}")
     
     def send_cc(self, channel, control, value):
         msg = mido.Message('control_change', channel=channel, control=control, value=value)
         self.midi_out.send_message(msg.bytes())
+
+    def all_notes_off(self):
+        if not self.midi_out: return
+        logger.info("MIDI: Sending All Notes Off to all channels")
+        for channel in range(16):
+            # CC 123 is All Notes Off
+            msg = mido.Message('control_change', channel=channel, control=123, value=0)
+            self.midi_out.send_message(msg.bytes())
+            # Also send CC 120 (All Sound Off) for safety
+            msg_sound_off = mido.Message('control_change', channel=channel, control=120, value=0)
+            self.midi_out.send_message(msg_sound_off.bytes())
 
 midi_engine = MidiEngine()

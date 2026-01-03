@@ -1,5 +1,4 @@
-import React from 'react';
-import { Settings, Music, Activity } from 'lucide-react';
+import { Settings, Music, Activity, Play, Square } from 'lucide-react';
 
 const GlobalControls = ({ state, ports, onUpdate }) => {
     if (!state) return null;
@@ -10,9 +9,28 @@ const GlobalControls = ({ state, ports, onUpdate }) => {
 
     return (
         <div className="bg-maple-dark/90 backdrop-blur-xl border border-maple-leaf/20 p-5 rounded-2xl w-64 text-maple-leaf shadow-2xl space-y-6">
-            <div className="flex items-center gap-2 border-b border-maple-leaf/10 pb-3">
-                <Settings className="w-5 h-5 opacity-60" />
-                <h2 className="text-sm font-bold uppercase tracking-widest opacity-80">Global Params</h2>
+            <div className="flex items-center justify-between border-b border-maple-leaf/10 pb-3">
+                <div className="flex items-center gap-2">
+                    <Settings className="w-5 h-5 opacity-60" />
+                    <h2 className="text-sm font-bold uppercase tracking-widest opacity-80">Global</h2>
+                </div>
+
+                {/* Play / Stop Toggle */}
+                <button
+                    onClick={() => handleUpdate({ playing: !state.playing })}
+                    className={`
+                        flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-tighter transition-all duration-300
+                        ${state.playing
+                            ? 'bg-red-500/10 text-red-500 border border-red-500/30 hover:bg-red-500/20'
+                            : 'bg-green-500/10 text-green-500 border border-green-500/30 hover:bg-green-500/20'}
+                    `}
+                >
+                    {state.playing ? (
+                        <><Square className="w-3 h-3 fill-current" /> Stop</>
+                    ) : (
+                        <><Play className="w-3 h-3 fill-current" /> Play</>
+                    )}
+                </button>
             </div>
 
             {/* MIDI Output Selection */}

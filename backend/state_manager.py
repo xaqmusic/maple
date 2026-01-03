@@ -20,6 +20,7 @@ class AppState:
     tempo: int = 120
     selected_midi_port: int = 0
     selected_notes: List[int] = None
+    playing: bool = False
 
     def __post_init__(self):
         if self.selected_notes is None:
@@ -31,6 +32,7 @@ class AppState:
             "selected_midi_port": self.selected_midi_port,
             "lobes": [vars(l) for l in self.lobes],
             "selected_notes": self.selected_notes,
+            "playing": self.playing,
         }
 
 class StateManager:

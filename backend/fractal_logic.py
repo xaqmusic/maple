@@ -27,20 +27,19 @@ class Lobe:
 
 class FractalLogic:
     def __init__(self):
-        self.playing = False
-        self.lobes = [
-            Lobe(0, "Left Bottom", 220, 0),
-            Lobe(1, "Left Top", 290, 1),
-            Lobe(2, "Center", 0, 2),
-            Lobe(3, "Right Top", 70, 3),
-            Lobe(4, "Right Bottom", 140, 4),
-        ]
+        self.reset_engine()
+
+    def reset_engine(self):
+        """Resets all internal phases and timers for a clean start."""
         self.last_tick = time.time()
+        self.last_stem_pulse = 0
+        # Clear all dynamic phase attributes
+        for attr in list(vars(self).keys()):
+            if attr.startswith("lobe_phase_"):
+                setattr(self, attr, 0.0)
+        logger.info("FractalLogic: Engine Reset")
         
     def tick(self, tempo: int, lobes: List, global_scale: List[int]):
-        if not self.playing:
-            return []
-        
         # Use only the global scale. Empty scale means silence.
         scale = global_scale if global_scale is not None else []
             
@@ -71,7 +70,8 @@ class FractalLogic:
             if not hasattr(self, phase_key):
                 setattr(self, phase_key, 0.0)
             
-            beat_interval = (60.0 / tempo) / lobe.division
+            div = max(0.1, lobe.division)
+            beat_interval = (60.0 / tempo) / div
             
             current_phase = getattr(self, phase_key)
             new_phase = current_phase + dt
