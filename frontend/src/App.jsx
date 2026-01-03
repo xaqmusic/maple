@@ -12,7 +12,46 @@ function App() {
   const [globalState, setGlobalState] = useState(null);
   const [ports, setPorts] = useState([]);
   const [selectedLobeId, setSelectedLobeId] = useState(null);
+  const [isUIHidden, setIsUIHidden] = useState(false);
   const ws = useRef(null);
+  const idleTimer = useRef(null);
+
+  useEffect(() => {
+    const handleActivity = () => {
+      setIsUIHidden(false);
+      if (idleTimer.current) clearTimeout(idleTimer.current);
+      idleTimer.current = setTimeout(() => setIsUIHidden(true), 10000);
+    };
+
+    const handleBlur = () => setIsUIHidden(true);
+    const handleFocus = () => handleActivity();
+
+    window.addEventListener('mousemove', handleActivity);
+    window.addEventListener('mousedown', handleActivity);
+    window.addEventListener('keydown', handleActivity);
+    window.addEventListener('touchstart', handleActivity);
+    window.addEventListener('blur', handleBlur);
+    window.addEventListener('focus', handleFocus);
+
+    // Initial timer
+    idleTimer.current = setTimeout(() => setIsUIHidden(true), 10000);
+
+    return () => {
+      window.removeEventListener('mousemove', handleActivity);
+      window.removeEventListener('mousedown', handleActivity);
+      window.removeEventListener('keydown', handleActivity);
+      window.removeEventListener('touchstart', handleActivity);
+      window.removeEventListener('blur', handleBlur);
+      window.removeEventListener('focus', handleFocus);
+      if (idleTimer.current) clearTimeout(idleTimer.current);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (isUIHidden) {
+      setSelectedLobeId(null);
+    }
+  }, [isUIHidden]);
 
   useEffect(() => {
     const connect = () => {
@@ -127,15 +166,15 @@ function App() {
       {/* Ambient Background Elements */}
       <div className="absolute inset-0 pointer-events-none opacity-20 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-maple-leaf/20 via-transparent to-transparent"></div>
 
-      <header className="absolute top-4 z-20 flex flex-col items-center gap-4 w-full pointer-events-none">
-        <div className="flex flex-col items-center pointer-events-auto">
+      <header className={`absolute top-4 z-20 flex flex-col items-center gap-4 w-full transition-all duration-1000 ${isUIHidden ? 'opacity-0 pointer-events-none -translate-y-4' : 'opacity-100 pointer-events-auto translate-y-0'}`}>
+        <div className="flex flex-col items-center">
           <h1 className="text-2xl font-thin text-maple-leaf tracking-widest uppercase opacity-80">Maple</h1>
           <div className={`text-xs ${connected ? 'text-green-500' : 'text-red-500'} transition-colors duration-500`}>
             {connected ? 'Sync Active' : 'Connecting...'}
           </div>
         </div>
 
-        <div className="pointer-events-auto">
+        <div>
           <ScaleSelector
             selectedNotes={globalState?.selected_notes}
             onUpdate={(notes) => handleGlobalUpdate({ selected_notes: notes })}
@@ -144,7 +183,7 @@ function App() {
       </header>
 
       {/* HUD / Left Panel */}
-      <div className="absolute left-8 top-1/2 -translate-y-1/2 z-30">
+      <div className={`absolute left-8 top-1/2 -translate-y-1/2 z-30 transition-all duration-1000 ${isUIHidden ? 'opacity-0 pointer-events-none -translate-x-4' : 'opacity-100 pointer-events-auto translate-x-0'}`}>
         <GlobalControls
           state={globalState}
           ports={ports}
@@ -161,6 +200,7 @@ function App() {
           stemPulseCount={stemPulse}
           selectedLobeId={selectedLobeId}
           onLobeClick={handleLobeClick}
+          isUIHidden={isUIHidden}
         />
       </div>
 

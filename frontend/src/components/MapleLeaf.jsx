@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import mapleLeafBg from '../assets/maple_leaf.svg';
 
-const MapleLeaf = ({ pulse, stemPulseCount, onLobeClick, selectedLobeId }) => {
+const MapleLeaf = ({ pulse, stemPulseCount, onLobeClick, selectedLobeId, isUIHidden }) => {
     const [activePulses, setActivePulses] = useState([]);
     const [stemFlash, setStemFlash] = useState(false);
     const [clickRipples, setClickRipples] = useState([]);
@@ -36,7 +36,7 @@ const MapleLeaf = ({ pulse, stemPulseCount, onLobeClick, selectedLobeId }) => {
 
     return (
         <svg viewBox="0 0 400 450" className="w-full h-full drop-shadow-[0_0_20px_rgba(212,175,55,0.2)]">
-            {/* Background Image */}
+            {/* Background Image (Base) */}
             <image
                 href={mapleLeafBg}
                 x="0"
@@ -46,6 +46,7 @@ const MapleLeaf = ({ pulse, stemPulseCount, onLobeClick, selectedLobeId }) => {
                 preserveAspectRatio="xMidYMid meet"
                 opacity="0.3"
                 transform="rotate(-40, 200, 225)"
+                className="transition-opacity duration-1000"
             />
 
             {/* Root Glow */}
@@ -177,6 +178,17 @@ const MapleLeaf = ({ pulse, stemPulseCount, onLobeClick, selectedLobeId }) => {
             ))}
 
 
+            {/* Foreground Overlay Image (Active during Idle) */}
+            <image
+                href={mapleLeafBg}
+                x="0"
+                y="50"
+                width="400"
+                height="450"
+                preserveAspectRatio="xMidYMid meet"
+                transform="rotate(-40, 200, 225)"
+                className={`pointer-events-none transition-opacity duration-1000 ${isUIHidden ? 'opacity-40' : 'opacity-0'}`}
+            />
         </svg>
     );
 };
