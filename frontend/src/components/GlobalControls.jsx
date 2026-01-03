@@ -62,7 +62,7 @@ const GlobalControls = ({ state, ports, onUpdate }) => {
                 </div>
                 <input
                     type="range"
-                    min="40" max="200" step="1"
+                    min="20" max="200" step="1"
                     value={state.tempo}
                     onChange={(e) => handleUpdate({ tempo: parseInt(e.target.value) })}
                     className="w-full accent-maple-leaf h-1.5 bg-gray-800 rounded-full appearance-none cursor-pointer hover:accent-maple-vein transition-all"

@@ -84,7 +84,7 @@ class FractalLogic:
                     base_note = random.choice(scale)
                     note = max(0, min(127, base_note + lobe.transpose))
                     
-                    velocity = random.randint(70, 110)
+                    velocity = max(0, min(127, lobe.velocity))
                     duration = beat_interval * 0.8
                     
                     events.append({

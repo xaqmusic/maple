@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-const MapleLeaf = ({ pulse, stemPulseCount }) => {
+const MapleLeaf = ({ pulse, stemPulseCount, onLobeClick, selectedLobeId }) => {
     const [activePulses, setActivePulses] = useState([]);
     const [stemFlash, setStemFlash] = useState(false);
 
@@ -96,12 +96,22 @@ const MapleLeaf = ({ pulse, stemPulseCount }) => {
                     <circle
                         cx={vein.end.x}
                         cy={vein.end.y}
-                        r={activePulses.some(p => p.lobe_id === vein.id) ? "10" : "8"}
-                        fill={activePulses.some(p => p.lobe_id === vein.id) ? "#d4af37" : "#1a0f0f"}
+                        r={selectedLobeId === vein.id ? "14" : activePulses.some(p => p.lobe_id === vein.id) ? "10" : "8"}
+                        fill={selectedLobeId === vein.id ? "#ff4d00" : activePulses.some(p => p.lobe_id === vein.id) ? "#d4af37" : "#1a0f0f"}
                         stroke="#d4af37"
-                        strokeWidth="2"
-                        className="transition-all duration-200"
-                    />
+                        strokeWidth={selectedLobeId === vein.id ? "3" : "2"}
+                        className="transition-all duration-300 cursor-pointer hover:stroke-white active:scale-95"
+                        onClick={() => onLobeClick(vein.id)}
+                    >
+                        {selectedLobeId === vein.id && (
+                            <animate
+                                attributeName="r"
+                                values="12;14;12"
+                                dur="2s"
+                                repeatCount="indefinite"
+                            />
+                        )}
+                    </circle>
                 </g>
             ))}
 

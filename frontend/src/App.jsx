@@ -11,6 +11,7 @@ function App() {
   const [lobes, setLobes] = useState([]);
   const [globalState, setGlobalState] = useState(null);
   const [ports, setPorts] = useState([]);
+  const [selectedLobeId, setSelectedLobeId] = useState(null);
   const ws = useRef(null);
 
   useEffect(() => {
@@ -73,16 +74,8 @@ function App() {
     }
   };
 
-  // Helper to position lobes based on index (hardcoded positions for the 5-lobe layout)
-  const getPositionStyle = (index) => {
-    switch (index) {
-      case 0: return "bottom-[10%] left-[5%]"; // Left Bottom
-      case 1: return "top-[25%] left-[5%]";    // Left Top
-      case 2: return "top-[15%] left-1/2 -translate-x-1/2"; // Center
-      case 3: return "top-[25%] right-[5%]";   // Right Top
-      case 4: return "bottom-[10%] right-[5%]"; // Right Bottom
-      default: return "";
-    }
+  const handleLobeClick = (lobeId) => {
+    setSelectedLobeId(prev => prev === lobeId ? null : lobeId);
   };
 
   return (
@@ -117,14 +110,23 @@ function App() {
 
       {/* Main Visualization */}
       <div className="relative w-[85vmin] h-[85vmin] flex items-center justify-center">
-        <MapleLeaf pulse={pulseData} stemPulseCount={stemPulse} />
+        <MapleLeaf
+          pulse={pulseData}
+          stemPulseCount={stemPulse}
+          selectedLobeId={selectedLobeId}
+          onLobeClick={handleLobeClick}
+        />
+      </div>
 
-        {/* Dynamic Lobe Controls */}
-        {lobes.map((lobe) => (
-          <div key={lobe.id} className={`absolute ${getPositionStyle(lobe.id)} transition-all duration-500`}>
-            <LobeControls lobe={lobe} onUpdate={handleLobeUpdate} />
-          </div>
-        ))}
+      {/* Contextual Right Panel */}
+      <div className={`absolute right-0 top-0 h-full w-80 bg-maple-dark/40 border-l border-maple-leaf/20 backdrop-blur-xl transition-transform duration-500 z-40 flex flex-col p-8 pt-24 ${selectedLobeId !== null ? 'translate-x-0' : 'translate-x-full'}`}>
+        {selectedLobeId !== null && (
+          <LobeControls
+            lobe={lobes.find(l => l.id === selectedLobeId)}
+            onUpdate={handleLobeUpdate}
+            onClose={() => setSelectedLobeId(null)}
+          />
+        )}
       </div>
     </div>
   );

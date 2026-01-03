@@ -13,6 +13,7 @@ class LobeState:
     instrument_channel: int = 0
     division: float = 1.0  # 1.0 = Quarter, 0.5 = Half, 2.0 = 8th, etc.
     transpose: int = 0  # Semitones offset
+    velocity: int = 100
 
 @dataclass
 class AppState:
