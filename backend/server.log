@@ -1,0 +1,9 @@
+INFO:     Started server process [1470593]
+INFO:     Waiting for application startup.
+INFO:maple.main:Starting generation loop
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:53198 - "WebSocket /ws" [accepted]
+INFO:     connection open
+INFO:maple.main:Updated Lobe 0: Lobe(id=0, name='Left Bottom', angle=220, instrument_channel=0, active=True, scale=[60, 62, 64, 67, 69], pulse_speed=1.0, probability=0.99)
+INFO:     connection closed

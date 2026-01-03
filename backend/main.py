@@ -1,0 +1,131 @@
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi.middleware.cors import CORSMiddleware
+import asyncio
+import json
+import logging
+from midi_engine import midi_engine
+from fractal_logic import fractal_logic
+from state_manager import state_manager
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("maple.main")
+
+app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # For dev, allow all
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+class ConnectionManager:
+    def __init__(self):
+        self.active_connections: list[WebSocket] = []
+
+    async def connect(self, websocket: WebSocket):
+        await websocket.accept()
+        self.active_connections.append(websocket)
+
+    def disconnect(self, websocket: WebSocket):
+        self.active_connections.remove(websocket)
+
+    async def broadcast(self, message: dict):
+        for connection in self.active_connections:
+            await connection.send_json(message)
+
+manager = ConnectionManager()
+
+@app.on_event("startup")
+async def startup_event():
+    # Start the generation loop
+    asyncio.create_task(generation_loop())
+
+async def generation_loop():
+    logger.info("Starting generation loop")
+    fractal_logic.playing = True # Auto start for now
+    
+    while True:
+        # Pass global tempo, lobes, and scale from state_manager to tick
+        events = fractal_logic.tick(
+            state_manager.state.tempo, 
+            state_manager.state.lobes,
+            state_manager.state.selected_notes
+        )
+        
+        for event in events:
+            if event['type'] == 'note':
+                # Send to MIDI
+                midi_engine.send_note_on(event['channel'], event['note'], event['velocity'])
+                
+                # Send to Frontend
+                logger.info(f"Broadcasting Note: {event['note']} for Lobe {event['lobe_id']} [Port: {midi_engine.active_port_name}]")
+                await manager.broadcast({
+                    "type": "pulse",
+                    "lobe_id": event['lobe_id'],
+                    "note": event['note']
+                })
+                
+                # Non-blocking note off scheduler
+                asyncio.create_task(schedule_note_off(event['channel'], event['note'], event['duration']))
+            
+            elif event['type'] == 'stem_pulse':
+                await manager.broadcast({
+                    "type": "stem_pulse",
+                    "timestamp": event['timestamp']
+                })
+
+        await asyncio.sleep(0.02) # Higher resolution for tempo
+
+async def schedule_note_off(channel, note, duration):
+    await asyncio.sleep(duration)
+    midi_engine.send_note_off(channel, note)
+
+@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket):
+    await manager.connect(websocket)
+    try:
+        # Send initial full state and port list
+        await websocket.send_json({
+            "type": "init",
+            "state": state_manager.state.to_dict(),
+            "ports": midi_engine.get_port_names()
+        })
+
+        while True:
+            data = await websocket.receive_text()
+            msg = json.loads(data)
+            
+            if msg['type'] == 'update_lobe':
+                lobe = state_manager.update_lobe(msg['lobe']['id'], msg['lobe'])
+                if lobe:
+                    logger.info(f"Updated Lobe {lobe.id}")
+                    # Broadcast update to all clients to keep them in sync
+                    await manager.broadcast({
+                        "type": "state_update",
+                        "lobe": vars(lobe)
+                    })
+
+            elif msg['type'] == 'update_global':
+                updates = msg['updates']
+                logger.info(f"Received global update request: {updates}")
+                state_manager.update_global(updates)
+                
+                # Handle MIDI port switching specifically if it changed
+                if 'selected_midi_port' in updates:
+                    p_idx = updates['selected_midi_port']
+                    logger.info(f"Triggering MIDI port switch to index {p_idx}")
+                    midi_engine.open_port(p_idx)
+                
+                await manager.broadcast({
+                    "type": "global_update",
+                    "updates": updates
+                })
+
+    except WebSocketDisconnect:
+        manager.disconnect(websocket)
+
+@app.get("/ports")
+def get_ports():
+    return midi_engine.get_port_names()
