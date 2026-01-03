@@ -21,6 +21,19 @@ Maple operates as a hybrid software instrument:
 - **Python 3.8+**
 - **Node.js 16+** & **npm**
 
+### Quick Launch
+After completing the initial setup steps below, you can launch the full application (backend + frontend) with a single command:
+
+**Linux/macOS**:
+```bash
+./start.sh
+```
+
+**Windows**:
+```powershell
+.\start.bat
+```
+
 ---
 
 ### Linux Setup

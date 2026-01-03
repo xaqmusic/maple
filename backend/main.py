@@ -1,4 +1,5 @@
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+import uvicorn
 from fastapi.middleware.cors import CORSMiddleware
 import asyncio
 import json
@@ -11,7 +12,15 @@ import time
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("maple.main")
 
-app = FastAPI()
+from contextlib import asynccontextmanager
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Start the generation loop
+    asyncio.create_task(generation_loop())
+    yield
+
+app = FastAPI(lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -37,11 +46,6 @@ class ConnectionManager:
             await connection.send_json(message)
 
 manager = ConnectionManager()
-
-@app.on_event("startup")
-async def startup_event():
-    # Start the generation loop
-    asyncio.create_task(generation_loop())
 
 async def generation_loop():
     logger.info("Starting generation loop")
@@ -191,3 +195,6 @@ async def websocket_endpoint(websocket: WebSocket):
 @app.get("/ports")
 def get_ports():
     return midi_engine.get_port_names()
+
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
