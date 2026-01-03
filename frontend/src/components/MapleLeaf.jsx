@@ -126,7 +126,7 @@ const MapleLeaf = ({ pulses = [], onPulsesProcessed, stemPulseCount, onLobeClick
                         cy={vein.end.y}
                         r={selectedLobeId === vein.id ? "14" : activePulses.some(p => p.lobe_id === vein.id) ? "10" : "8"}
                         fill={selectedLobeId === vein.id ? "#ff4d00" : activePulses.some(p => p.lobe_id === vein.id) ? "#d4af37" : (isUIHidden ? "#2d0a0a" : "#1a0f0f")}
-                        stroke={isUIHidden && !activePulses.some(p => p.lobe_id === vein.id) ? "#4a0a0a" : "#d4af37"}
+                        stroke={isUIHidden && !activePulses.some(p => p.lobe_id === vein.id) ? "#4a0a0a" : "#d4af3770"}
                         strokeWidth={selectedLobeId === vein.id ? "3" : "2"}
                         className="transition-all duration-300 cursor-pointer hover:stroke-white"
                         onClick={() => {
