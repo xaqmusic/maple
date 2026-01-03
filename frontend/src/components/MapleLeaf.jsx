@@ -26,11 +26,11 @@ const MapleLeaf = ({ pulse, stemPulseCount, onLobeClick, selectedLobeId }) => {
     // Simplified SVG paths for a 5-lobed leaf
     // In a real scenario, these would be more complex bezier curves
     const veins = [
-        { id: 0, d: "M 217,430 L 233,330 Q 140,310 110,330", end: { x: 110, y: 330 }, name: "Left Bottom" },
-        { id: 1, d: "M 217,430 L 233,330 Q 160,260 110,210", end: { x: 110, y: 210 }, name: "Left Top" },
-        { id: 2, d: "M 217,430 L 233,330 Q 230,210 215,110", end: { x: 215, y: 110 }, name: "Center" },
-        { id: 3, d: "M 217,430 L 233,330 Q 240,260 358,200", end: { x: 358, y: 200 }, name: "Right Top" },
-        { id: 4, d: "M 217,430 L 233,330 Q 260,310 357,310", end: { x: 357, y: 310 }, name: "Right Bottom" }
+        { id: 0, d: "M 217,430 Q 250,370 233,330 Q 140,310 110,330", end: { x: 110, y: 330 }, name: "Left Bottom" },
+        { id: 1, d: "M 217,430 Q 250,370 233,330 Q 160,260 110,210", end: { x: 110, y: 210 }, name: "Left Top" },
+        { id: 2, d: "M 217,430 Q 250,370 233,330 Q 230,210 215,110", end: { x: 215, y: 110 }, name: "Center" },
+        { id: 3, d: "M 217,430 Q 250,370 233,330 Q 240,260 358,200", end: { x: 358, y: 200 }, name: "Right Top" },
+        { id: 4, d: "M 217,430 Q 250,370 233,330 Q 260,310 357,310", end: { x: 357, y: 310 }, name: "Right Bottom" }
     ];
 
     return (
@@ -58,9 +58,10 @@ const MapleLeaf = ({ pulse, stemPulseCount, onLobeClick, selectedLobeId }) => {
 
             {/* Stem with Flash effect */}
             <path
-                d="M 217,430 L 233,330"
+                d="M 217,430 Q 250,370 233,330"
+                fill="none"
                 stroke={stemFlash ? "#ff4d00" : "#8b4513"}
-                strokeWidth={stemFlash ? "6" : "4"}
+                strokeWidth={stemFlash ? "3" : "2"}
                 strokeLinecap="round"
                 className="transition-all duration-150 ease-out"
             />
