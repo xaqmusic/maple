@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import mapleLeafBg from '../assets/maple_leaf.svg';
 
 const MapleLeaf = ({ pulse, stemPulseCount, onLobeClick, selectedLobeId }) => {
     const [activePulses, setActivePulses] = useState([]);
@@ -25,17 +26,29 @@ const MapleLeaf = ({ pulse, stemPulseCount, onLobeClick, selectedLobeId }) => {
     // Simplified SVG paths for a 5-lobed leaf
     // In a real scenario, these would be more complex bezier curves
     const veins = [
-        { id: 0, d: "M 200,450 L 200,400 Q 150,300 100,250", end: { x: 100, y: 250 }, name: "Left Bottom" },
-        { id: 1, d: "M 200,450 L 200,400 Q 180,280 150,150", end: { x: 150, y: 150 }, name: "Left Top" },
-        { id: 2, d: "M 200,450 L 200,400 Q 200,250 200,50", end: { x: 200, y: 50 }, name: "Center" },
-        { id: 3, d: "M 200,450 L 200,400 Q 220,280 250,150", end: { x: 250, y: 150 }, name: "Right Top" },
-        { id: 4, d: "M 200,450 L 200,400 Q 250,300 300,250", end: { x: 300, y: 250 }, name: "Right Bottom" }
+        { id: 0, d: "M 217,430 L 233,330 Q 140,310 110,330", end: { x: 110, y: 330 }, name: "Left Bottom" },
+        { id: 1, d: "M 217,430 L 233,330 Q 160,260 110,210", end: { x: 110, y: 210 }, name: "Left Top" },
+        { id: 2, d: "M 217,430 L 233,330 Q 230,210 215,110", end: { x: 215, y: 110 }, name: "Center" },
+        { id: 3, d: "M 217,430 L 233,330 Q 240,260 358,200", end: { x: 358, y: 200 }, name: "Right Top" },
+        { id: 4, d: "M 217,430 L 233,330 Q 260,310 357,310", end: { x: 357, y: 310 }, name: "Right Bottom" }
     ];
 
     return (
         <svg viewBox="0 0 400 450" className="w-full h-full drop-shadow-[0_0_20px_rgba(212,175,55,0.2)]">
+            {/* Background Image */}
+            <image
+                href={mapleLeafBg}
+                x="0"
+                y="50"
+                width="400"
+                height="450"
+                preserveAspectRatio="xMidYMid meet"
+                opacity="0.3"
+                transform="rotate(-40, 200, 225)"
+            />
+
             {/* Root Glow */}
-            <circle cx="200" cy="450" r="30" fill="url(#rootGlow)" className="opacity-40" />
+            <circle cx="217" cy="430" r="30" fill="url(#rootGlow)" className="opacity-40" />
             <defs>
                 <radialGradient id="rootGlow">
                     <stop offset="0%" stopColor="#ff4d00" />
@@ -45,7 +58,7 @@ const MapleLeaf = ({ pulse, stemPulseCount, onLobeClick, selectedLobeId }) => {
 
             {/* Stem with Flash effect */}
             <path
-                d="M 200,450 L 200,400"
+                d="M 217,430 L 233,330"
                 stroke={stemFlash ? "#ff4d00" : "#8b4513"}
                 strokeWidth={stemFlash ? "6" : "4"}
                 strokeLinecap="round"
@@ -115,15 +128,7 @@ const MapleLeaf = ({ pulse, stemPulseCount, onLobeClick, selectedLobeId }) => {
                 </g>
             ))}
 
-            {/* Leaf Outcome Outline (Abstract) */}
-            <path
-                d="M 200,400 L 100,250 L 150,150 L 200,50 L 250,150 L 300,250 Z"
-                fill="none"
-                stroke="#d4af37"
-                strokeWidth="1"
-                strokeOpacity="0.2"
-                strokeDasharray="4 4"
-            />
+
         </svg>
     );
 };
