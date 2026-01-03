@@ -4,6 +4,7 @@ import mapleLeafBg from '../assets/maple_leaf.svg';
 const MapleLeaf = ({ pulse, stemPulseCount, onLobeClick, selectedLobeId }) => {
     const [activePulses, setActivePulses] = useState([]);
     const [stemFlash, setStemFlash] = useState(false);
+    const [clickRipples, setClickRipples] = useState([]);
 
     useEffect(() => {
         if (pulse) {
@@ -114,8 +115,15 @@ const MapleLeaf = ({ pulse, stemPulseCount, onLobeClick, selectedLobeId }) => {
                         fill={selectedLobeId === vein.id ? "#ff4d00" : activePulses.some(p => p.lobe_id === vein.id) ? "#d4af37" : "#1a0f0f"}
                         stroke="#d4af37"
                         strokeWidth={selectedLobeId === vein.id ? "3" : "2"}
-                        className="transition-all duration-300 cursor-pointer hover:stroke-white active:scale-95"
-                        onClick={() => onLobeClick(vein.id)}
+                        className="transition-all duration-300 cursor-pointer hover:stroke-white"
+                        onClick={() => {
+                            const rippleId = Date.now() + Math.random();
+                            setClickRipples(prev => [...prev, { id: rippleId, x: vein.end.x, y: vein.end.y }]);
+                            setTimeout(() => {
+                                setClickRipples(prev => prev.filter(r => r.id !== rippleId));
+                            }, 1000);
+                            onLobeClick(vein.id);
+                        }}
                     >
                         {selectedLobeId === vein.id && (
                             <animate
@@ -126,6 +134,45 @@ const MapleLeaf = ({ pulse, stemPulseCount, onLobeClick, selectedLobeId }) => {
                             />
                         )}
                     </circle>
+
+                    {/* Click Ripples */}
+                    {clickRipples.filter(r => r.x === vein.end.x && r.y === vein.end.y).map(ripple => (
+                        <circle
+                            key={ripple.id}
+                            cx={ripple.x}
+                            cy={ripple.y}
+                            r="8"
+                            fill="none"
+                            stroke="#d4af37"
+                            strokeWidth="2"
+                            className="pointer-events-none"
+                        >
+                            <animate
+                                attributeName="r"
+                                from="8"
+                                to="40"
+                                dur="0.6s"
+                                begin="0s"
+                                fill="freeze"
+                            />
+                            <animate
+                                attributeName="opacity"
+                                from="0.8"
+                                to="0"
+                                dur="0.6s"
+                                begin="0s"
+                                fill="freeze"
+                            />
+                            <animate
+                                attributeName="stroke-width"
+                                from="2"
+                                to="0.5"
+                                dur="0.6s"
+                                begin="0s"
+                                fill="freeze"
+                            />
+                        </circle>
+                    ))}
                 </g>
             ))}
 

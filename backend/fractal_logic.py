@@ -79,9 +79,15 @@ class FractalLogic:
             if new_phase >= beat_interval:
                 setattr(self, phase_key, new_phase % beat_interval)
                 
-                # Musical choice: Use probability to decide if we play this specific beat
-                if scale and random.random() < lobe.probability:
-                    base_note = random.choice(scale)
+                # Filter scale based on register
+                lobe_scale = scale
+                if lobe.register == "low":
+                    lobe_scale = [n for n in scale if n < 72]
+                elif lobe.register == "high":
+                    lobe_scale = [n for n in scale if n >= 72]
+
+                if lobe_scale and random.random() < lobe.probability:
+                    base_note = random.choice(lobe_scale)
                     note = max(0, min(127, base_note + lobe.transpose))
                     
                     velocity = max(0, min(127, lobe.velocity))

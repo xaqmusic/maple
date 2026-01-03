@@ -1,0 +1,70 @@
+{
+    "tempo": 80,
+    "selected_midi_port": 1,
+    "lobes": [
+        {
+            "id": 0,
+            "name": "Left Bottom",
+            "active": true,
+            "probability": 0.41,
+            "instrument_channel": 0,
+            "division": 0.25,
+            "transpose": -12,
+            "velocity": 68,
+            "register": "low"
+        },
+        {
+            "id": 1,
+            "name": "Left Top",
+            "active": true,
+            "probability": 0.5,
+            "instrument_channel": 0,
+            "division": 1.0,
+            "transpose": 0,
+            "velocity": 100,
+            "register": "all"
+        },
+        {
+            "id": 2,
+            "name": "Center",
+            "active": true,
+            "probability": 0.5,
+            "instrument_channel": 0,
+            "division": 1.0,
+            "transpose": 0,
+            "velocity": 100,
+            "register": "all"
+        },
+        {
+            "id": 3,
+            "name": "Right Top",
+            "active": true,
+            "probability": 0.5,
+            "instrument_channel": 0,
+            "division": 1.0,
+            "transpose": 0,
+            "velocity": 100,
+            "register": "all"
+        },
+        {
+            "id": 4,
+            "name": "Right Bottom",
+            "active": true,
+            "probability": 0.5,
+            "instrument_channel": 0,
+            "division": 4,
+            "transpose": 36,
+            "velocity": 14,
+            "register": "high"
+        }
+    ],
+    "selected_notes": [
+        60,
+        65,
+        74,
+        76,
+        81,
+        83
+    ],
+    "playing": false
+}

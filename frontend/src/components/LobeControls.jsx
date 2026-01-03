@@ -101,6 +101,22 @@ const LobeControls = ({ lobe, onUpdate, onClose }) => {
                         />
                     </div>
 
+                    <div>
+                        <div className="flex justify-between mb-2">
+                            <label className="text-xs font-bold opacity-50 uppercase tracking-widest">Register</label>
+                            <span className="text-xs font-mono lowercase">{lobe.register || 'all'}</span>
+                        </div>
+                        <select
+                            value={lobe.register || 'all'}
+                            onChange={(e) => handleChange('register', e.target.value)}
+                            className="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-sm focus:border-maple-leaf/50 outline-none transition-colors appearance-none"
+                        >
+                            <option value="all">All Notes</option>
+                            <option value="low">Low (Octave 1)</option>
+                            <option value="high">High (Octave 2)</option>
+                        </select>
+                    </div>
+
                     <div className="pt-6 border-t border-white/5">
                         <label className="text-xs font-bold opacity-50 uppercase tracking-widest block mb-4">MIDI Output</label>
                         <div className="space-y-4">

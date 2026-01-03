@@ -1,6 +1,6 @@
-import { Settings, Music, Activity, Play, Square } from 'lucide-react';
+import { Settings, Music, Activity, Play, Square, Download, Upload } from 'lucide-react';
 
-const GlobalControls = ({ state, ports, onUpdate }) => {
+const GlobalControls = ({ state, ports, onUpdate, onSave, onLoad }) => {
     if (!state) return null;
 
     const handleUpdate = (updates) => {
@@ -13,6 +13,23 @@ const GlobalControls = ({ state, ports, onUpdate }) => {
                 <div className="flex items-center gap-2">
                     <Settings className="w-5 h-5 opacity-60" />
                     <h2 className="text-sm font-bold uppercase tracking-widest opacity-80">Global</h2>
+                </div>
+
+                <div className="flex gap-2">
+                    <button
+                        onClick={onSave}
+                        className="p-1.5 rounded-md text-maple-leaf/60 hover:text-maple-leaf hover:bg-maple-leaf/10 transition-all"
+                        title="Save State (Download)"
+                    >
+                        <Download className="w-4 h-4" />
+                    </button>
+                    <button
+                        onClick={onLoad}
+                        className="p-1.5 rounded-md text-maple-leaf/60 hover:text-maple-leaf hover:bg-maple-leaf/10 transition-all"
+                        title="Load State (Upload)"
+                    >
+                        <Upload className="w-4 h-4" />
+                    </button>
                 </div>
 
                 {/* Play / Stop Toggle */}

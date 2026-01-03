@@ -5,7 +5,7 @@ import json
 import logging
 from midi_engine import midi_engine
 from fractal_logic import fractal_logic
-from state_manager import state_manager
+from state_manager import state_manager, AppState
 import time
 
 logging.basicConfig(level=logging.INFO)
@@ -145,7 +145,47 @@ async def websocket_endpoint(websocket: WebSocket):
                     "updates": updates
                 })
 
+            elif msg['type'] == 'save_state':
+                success = state_manager.save_to_file("maple_state.json")
+                logger.info(f"State save {'successful' if success else 'failed'}")
+
+            elif msg['type'] == 'load_state':
+                new_state = state_manager.load_from_file("maple_state.json")
+                if new_state:
+                    logger.info("State loaded successfully. Broadcasting updates.")
+                    # Broadcast full init to refresh everyone
+                    await manager.broadcast({
+                        "type": "init",
+                        "state": state_manager.state.to_dict(),
+                        "ports": midi_engine.get_port_names()
+                    })
+                    
+                    # Specifically trigger MIDI port switch if it changed in loaded state
+                    midi_engine.open_port(state_manager.state.selected_midi_port)
+
+            elif msg['type'] == 'apply_full_state':
+                state_data = msg['state']
+                logger.info("Applying full state from client")
+                
+                # Preserve current playing state
+                current_playing = state_manager.state.playing
+                
+                state_manager.state = AppState.from_dict(state_data)
+                state_manager.state.playing = current_playing
+                
+                # Broadcast back to all to sync up
+                await manager.broadcast({
+                    "type": "init",
+                    "state": state_manager.state.to_dict(),
+                    "ports": midi_engine.get_port_names()
+                })
+                # Re-open midi port just in case it changed
+                midi_engine.open_port(state_manager.state.selected_midi_port)
+
     except WebSocketDisconnect:
+        manager.disconnect(websocket)
+    except Exception as e:
+        logger.error(f"WebSocket Error: {e}", exc_info=True)
         manager.disconnect(websocket)
 
 @app.get("/ports")

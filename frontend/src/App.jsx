@@ -74,6 +74,50 @@ function App() {
     }
   };
 
+  const handleSave = () => {
+    const fullState = {
+      ...globalState,
+      lobes: lobes
+    };
+    const blob = new Blob([JSON.stringify(fullState, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `maple_preset_${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleLoad = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    input.onchange = (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        try {
+          const state = JSON.parse(event.target.result);
+          if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+            ws.current.send(JSON.stringify({
+              type: 'apply_full_state',
+              state: state
+            }));
+          }
+        } catch (err) {
+          console.error('Failed to parse state file:', err);
+          alert('Invalid preset file.');
+        }
+      };
+      reader.readAsText(file);
+    };
+    input.click();
+  };
+
   const handleLobeClick = (lobeId) => {
     setSelectedLobeId(prev => prev === lobeId ? null : lobeId);
   };
@@ -105,6 +149,8 @@ function App() {
           state={globalState}
           ports={ports}
           onUpdate={handleGlobalUpdate}
+          onSave={handleSave}
+          onLoad={handleLoad}
         />
       </div>
 

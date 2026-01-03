@@ -3,19 +3,32 @@
 @tailwind utilities;
 
 body {
-    background-color: #050505;
-    color: #e5e5e5;
-    overflow: hidden; /* Ambient app, full screen ideally */
+  background-color: #050505;
+  color: #e5e5e5;
+  overflow: hidden;
+  /* Ambient app, full screen ideally */
 }
 
 /* Custom scrollbar if needed */
 ::-webkit-scrollbar {
   width: 8px;
 }
+
 ::-webkit-scrollbar-track {
   background: #111;
 }
+
 ::-webkit-scrollbar-thumb {
   background: #444;
   border-radius: 4px;
+}
+
+/* Dark theme for dropdowns */
+select {
+  color-scheme: dark;
+}
+
+option {
+  background-color: #1a1a1a;
+  color: #d4af37;
 }
