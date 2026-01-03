@@ -1,6 +1,7 @@
 # Maple
 
 Maple is a generative MIDI sequencer and visualizer designed to create organic, evolving musical patterns. It combines a Python-based fractal generation engine with a responsive, interactive web frontend.  This app is inspired by my lovely wife who enjoys all things maple, woodsy, and organic.
+
 <img width="564" height="666" alt="Screenshot from 2026-01-03 10-37-04" src="https://github.com/user-attachments/assets/f86bf382-317f-4282-9e87-8ee41c153b19" />
 
 ## Overview
@@ -8,6 +9,7 @@ Maple is a generative MIDI sequencer and visualizer designed to create organic, 
 Maple operates as a hybrid software instrument:
 - **Backend (Python)**: Runs the generative engine, handles MIDI I/O, and manages the application state. It uses a "Lobe" based system where parameters control the probability and timing of musical events.
 - **Frontend (React)**: Provides a beautiful, maple-leaf-inspired visualization that reacts in real-time to the generated music. It also serves as the control surface for the generative engine, allowing you to tweak parameters, select scales, and manage MIDI output.
+
 <img width="1441" height="908" alt="image" src="https://github.com/user-attachments/assets/80a2e082-7429-4a56-947e-8064c086a4c2" />
 
 ### Key Features
