@@ -5,7 +5,7 @@ import ScaleSelector from './components/ScaleSelector';
 import GlobalControls from './components/GlobalControls';
 
 function App() {
-  const [pulseData, setPulseData] = useState(null);
+  const [pulseQueue, setPulseQueue] = useState([]);
   const [stemPulse, setStemPulse] = useState(0);
   const [connected, setConnected] = useState(false);
   const [lobes, setLobes] = useState([]);
@@ -65,7 +65,7 @@ function App() {
       ws.current.onmessage = (event) => {
         const data = JSON.parse(event.data);
         if (data.type === 'pulse') {
-          setPulseData(data);
+          setPulseQueue(prev => [...prev, { ...data, id: Date.now() + Math.random() }]);
         } else if (data.type === 'stem_pulse') {
           setStemPulse(prev => prev + 1);
         } else if (data.type === 'init') {
@@ -196,7 +196,8 @@ function App() {
       {/* Main Visualization */}
       <div className="relative w-[85vmin] h-[85vmin] flex items-center justify-center">
         <MapleLeaf
-          pulse={pulseData}
+          pulses={pulseQueue}
+          onPulsesProcessed={() => setPulseQueue([])}
           stemPulseCount={stemPulse}
           selectedLobeId={selectedLobeId}
           onLobeClick={handleLobeClick}

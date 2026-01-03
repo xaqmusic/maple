@@ -1,20 +1,32 @@
 import React, { useEffect, useState } from 'react';
 import mapleLeafBg from '../assets/maple_leaf.svg';
 
-const MapleLeaf = ({ pulse, stemPulseCount, onLobeClick, selectedLobeId, isUIHidden }) => {
+const MapleLeaf = ({ pulses = [], onPulsesProcessed, stemPulseCount, onLobeClick, selectedLobeId, isUIHidden }) => {
     const [activePulses, setActivePulses] = useState([]);
     const [stemFlash, setStemFlash] = useState(false);
     const [clickRipples, setClickRipples] = useState([]);
 
     useEffect(() => {
-        if (pulse) {
-            const id = Date.now() + Math.random();
-            setActivePulses(prev => [...prev, { ...pulse, id, createdAt: Date.now() }]);
-            setTimeout(() => {
-                setActivePulses(prev => prev.filter(p => p.id !== id));
-            }, 1000); // Reduced duration to match animation
+        if (pulses.length > 0) {
+            const now = Date.now();
+            const newPulses = pulses.map(p => ({
+                ...p,
+                id: p.id || (now + Math.random()),
+                createdAt: now
+            }));
+
+            setActivePulses(prev => [...prev, ...newPulses]);
+
+            // Clean up each pulse after animation
+            newPulses.forEach(p => {
+                setTimeout(() => {
+                    setActivePulses(prev => prev.filter(ap => ap.id !== p.id));
+                }, 1000);
+            });
+
+            onPulsesProcessed();
         }
-    }, [pulse]);
+    }, [pulses, onPulsesProcessed]);
 
     useEffect(() => {
         if (stemPulseCount > 0) {
@@ -113,16 +125,24 @@ const MapleLeaf = ({ pulse, stemPulseCount, onLobeClick, selectedLobeId, isUIHid
                         cx={vein.end.x}
                         cy={vein.end.y}
                         r={selectedLobeId === vein.id ? "14" : activePulses.some(p => p.lobe_id === vein.id) ? "10" : "8"}
-                        fill={selectedLobeId === vein.id ? "#ff4d00" : activePulses.some(p => p.lobe_id === vein.id) ? "#d4af37" : "#1a0f0f"}
-                        stroke="#d4af37"
+                        fill={selectedLobeId === vein.id ? "#ff4d00" : activePulses.some(p => p.lobe_id === vein.id) ? "#d4af37" : (isUIHidden ? "#2d0a0a" : "#1a0f0f")}
+                        stroke={isUIHidden && !activePulses.some(p => p.lobe_id === vein.id) ? "#4a0a0a" : "#d4af37"}
                         strokeWidth={selectedLobeId === vein.id ? "3" : "2"}
                         className="transition-all duration-300 cursor-pointer hover:stroke-white"
                         onClick={() => {
                             const rippleId = Date.now() + Math.random();
+                            const pulseId = Date.now() + Math.random();
+
                             setClickRipples(prev => [...prev, { id: rippleId, x: vein.end.x, y: vein.end.y }]);
+                            setActivePulses(prev => [...prev, { id: pulseId, lobe_id: vein.id, createdAt: Date.now() }]);
+
                             setTimeout(() => {
                                 setClickRipples(prev => prev.filter(r => r.id !== rippleId));
                             }, 1000);
+                            setTimeout(() => {
+                                setActivePulses(prev => prev.filter(p => p.id !== pulseId));
+                            }, 1000);
+
                             onLobeClick(vein.id);
                         }}
                     >

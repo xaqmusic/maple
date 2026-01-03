@@ -15,39 +15,38 @@ const GlobalControls = ({ state, ports, onUpdate, onSave, onLoad }) => {
                     <h2 className="text-sm font-bold uppercase tracking-widest opacity-80">Global</h2>
                 </div>
 
-                <div className="flex gap-2">
+                <div className="flex items-center gap-1.5">
                     <button
                         onClick={onSave}
-                        className="p-1.5 rounded-md text-maple-leaf/60 hover:text-maple-leaf hover:bg-maple-leaf/10 transition-all"
+                        className="p-1 px-1 rounded-md text-maple-leaf/60 hover:text-maple-leaf hover:bg-maple-leaf/10 transition-all border border-transparent hover:border-maple-leaf/20"
                         title="Save State (Download)"
                     >
-                        <Download className="w-4 h-4" />
+                        <Download className="w-3.5 h-3.5" />
                     </button>
                     <button
                         onClick={onLoad}
-                        className="p-1.5 rounded-md text-maple-leaf/60 hover:text-maple-leaf hover:bg-maple-leaf/10 transition-all"
+                        className="p-1 px-1 rounded-md text-maple-leaf/60 hover:text-maple-leaf hover:bg-maple-leaf/10 transition-all border border-transparent hover:border-maple-leaf/20"
                         title="Load State (Upload)"
                     >
-                        <Upload className="w-4 h-4" />
+                        <Upload className="w-3.5 h-3.5" />
+                    </button>
+
+                    <button
+                        onClick={() => handleUpdate({ playing: !state.playing })}
+                        className={`
+                            ml-1 flex items-center gap-1.5 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest transition-all duration-300
+                            ${state.playing
+                                ? 'bg-red-500/10 text-red-500 border border-red-500/30 hover:bg-red-500/20 shadow-[0_0_10px_rgba(239,68,68,0.1)]'
+                                : 'bg-green-500/10 text-green-500 border border-green-500/30 hover:bg-green-500/20 shadow-[0_0_10px_rgba(34,197,94,0.1)]'}
+                        `}
+                    >
+                        {state.playing ? (
+                            <><Square className="w-2.5 h-2.5 fill-current" /> Stop</>
+                        ) : (
+                            <><Play className="w-2.5 h-2.5 fill-current" /> Play</>
+                        )}
                     </button>
                 </div>
-
-                {/* Play / Stop Toggle */}
-                <button
-                    onClick={() => handleUpdate({ playing: !state.playing })}
-                    className={`
-                        flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-tighter transition-all duration-300
-                        ${state.playing
-                            ? 'bg-red-500/10 text-red-500 border border-red-500/30 hover:bg-red-500/20'
-                            : 'bg-green-500/10 text-green-500 border border-green-500/30 hover:bg-green-500/20'}
-                    `}
-                >
-                    {state.playing ? (
-                        <><Square className="w-3 h-3 fill-current" /> Stop</>
-                    ) : (
-                        <><Play className="w-3 h-3 fill-current" /> Play</>
-                    )}
-                </button>
             </div>
 
             {/* MIDI Output Selection */}

@@ -24,7 +24,7 @@ const LobeControls = ({ lobe, onUpdate, onClose }) => {
 
             <div className="space-y-8 overflow-y-auto pr-2 custom-scrollbar">
                 <div className="flex justify-between items-center p-4 bg-white/5 rounded-xl border border-white/10 hover:border-maple-leaf/30 transition-colors">
-                    <label className="text-sm font-medium opacity-70 tracking-wide uppercase">Active State</label>
+                    <label className="text-sm font-medium opacity-70 tracking-wide uppercase">Active</label>
                     <button
                         onClick={() => handleChange('active', !lobe.active)}
                         className={`w-12 h-6 rounded-full transition-colors relative ${lobe.active ? 'bg-maple-leaf' : 'bg-gray-700'}`}
